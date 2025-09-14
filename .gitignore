@@ -1,0 +1,19 @@
+# Ignore node_modules folder (common in JavaScript projects)
+node_modules/
+
+# Ignore Python virtual environments
+venv/
+env/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore large data or log files
+*.log
+*.data
+*.sqlite
