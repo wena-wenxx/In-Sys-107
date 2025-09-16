@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #6b7280;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --light: #f9fafb;
+            --dark: #1f2937;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(to right, #f8fafc, #ffffff);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            background: #f8f9fa;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(to right, #f1f5f9, #e9ecef);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .auth-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        .log-entry {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .integrity-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-input {
+            padding-left: 45px;
+        }
+
+        
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+
+        .login-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: space-between;
+        }
+
+        .btn-full {
+            flex: 1;
+        }
+
+        .form-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .form-divider::before,
+        .form-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: var(--border);
+        }
+
+        .form-divider span {
+            padding: 0 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle" class="text-lg font-semibold"></h3>
+                    <button onclick="hideModal('messageModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage" class="text-gray-600"></p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="hideModal('messageModal')" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                        <i class="fas fa-boxes text-indigo-600"></i> Inventory Management System
+                    </h1>
+
+                    <div class="auth-container">
+                        <div id="authSection" class="login-form">
+                            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Sign In to Your Account</h2>
+                            <div class="form-group">
+                                <label for="username" class="form-label">Username</label>
+                                <input id="username" type="text" class="form-input" placeholder="Enter your username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password</label>
+                                <input id="password" type="password" class="form-input"
+                                    placeholder="Enter your password">
+                            </div>
+                            <div class="form-actions">
+                                <button onclick="login()" class="btn btn-primary btn-full">
+                                    <i class="fas fa-sign-in-alt"></i> Log In
+                                </button>
+                            </div>
+                            <div class="form-divider">
+                                <span>or</span>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-3">Don't have an account yet?</p>
+                                <button onclick="register()" class="btn btn-secondary">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="userProfile" class="hidden items-center gap-4">
+                            <span id="currentUserDisplay" class="font-medium text-gray-700"></span>
+                            <button onclick="logout()" class="btn btn-danger">
+                                <i class="fas fa-sign-out-alt"></i> Log Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div id="appContent" class="hidden">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Items</div>
+                            <div id="totalItems" class="stat-value">0</div>
+                            <i class="fas fa-box text-indigo-500 text-xl"></i>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Value</div>
+                            <div id="totalValue" class="stat-value">$0.00</div>
+                            <i class="fas fa-dollar-sign text-green-500 text-xl"></i>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Low Stock Items</div>
+                            <div id="lowStockCount" class="stat-value">0</div>
+                            <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Categories</div>
+                            <div id="categoryCount" class="stat-value">0</div>
+                            <i class="fas fa-tags text-blue-500 text-xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h2 class="section-title">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </h2>
+                        <div id="lowStockAlerts" class="alert alert-danger hidden">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <p class="font-bold">Low Stock Alert!</p>
+                                <ul id="lowStockList" class="list-disc list-inside mt-2"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                            <h2 class="section-title">
+                                <i class="fas fa-box"></i> Inventory List
+                            </h2>
+                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                <div class="search-container w-full md:w-auto">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input id="searchFilter" type="text" placeholder="Search by name or SKU..."
+                                        oninput="renderInventory()" class="input-field search-input">
+                                </div>
+                                <button onclick="showAddItemModal()" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add New Item
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>SKU</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Category</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                        <h2 class="section-title">
+                            <i class="fas fa-clipboard-list"></i> Transaction Log
+                        </h2>
+                        <div id="transactionLog" class="bg-white p-4 rounded-lg overflow-y-auto max-h-64 shadow-inner">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="itemModalTitle" class="text-xl font-bold text-gray-800">Add Item</h3>
+                <button onclick="hideModal('itemModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="space-y-4">
+                    <input id="itemId" type="hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                        <input id="itemName" type="text" placeholder="Item Name" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                        <input id="itemSKU" type="text" placeholder="SKU" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <input id="itemQuantity" type="number" placeholder="Quantity" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                        <input id="itemPrice" type="number" placeholder="Price" step="0.01" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <input id="itemCategory" type="text" placeholder="Category" class="input-field">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="hideModal('itemModal')" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveItem()" class="btn btn-primary">Save Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateChecksum(data) {
+            let hash = 0;
+            const dataString = JSON.stringify(data);
+            if (dataString.length === 0) return hash;
+            for (let i = 0; i < dataString.length; i++) {
+                const char = dataString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0; 
+            }
+            return hash.toString();
+        }
+
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': currentUser || '',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API request failed');
+                }
+
+                return await response.json();
+            } catch (error) {
+                showMessage('Error', error.message);
+                throw error;
+            }
+        }
+
+        let currentUser = localStorage.getItem('inventory_currentUser');
+        let inventory = [];
+        const LOW_STOCK_THRESHOLD = 10;
+
+        function showModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function hideModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showMessage(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            showModal('messageModal');
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showMessage('Error', 'Please enter both username and password');
+                return;
+            }
+
+            try {
+                await apiCall('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                currentUser = username;
+                localStorage.setItem('inventory_currentUser', currentUser);
+                await updateUI();
+                showMessage('Success', 'Logged in successfully!');
+            } catch (error) {
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showMessage('Error', 'Please enter both username and password');
+                return;
+            }
+
+            try {
+                await apiCall('/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                showMessage('Success', 'Account created successfully! You can now log in.');
+            } catch (error) {
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('inventory_currentUser');
+            updateUI();
+        }
+
+        function showAddItemModal() {
+            document.getElementById('itemModalTitle').textContent = 'Add Item';
+            document.getElementById('itemId').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemSKU').value = '';
+            document.getElementById('itemQuantity').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemCategory').value = '';
+            showModal('itemModal');
+        }
+
+        function showEditItemModal(id) {
+            const item = inventory.find(item => item.id === id);
+            if (item) {
+                document.getElementById('itemModalTitle').textContent = 'Edit Item';
+                document.getElementById('itemId').value = item.id;
+                document.getElementById('itemName').value = item.name;
+                document.getElementById('itemSKU').value = item.sku;
+                document.getElementById('itemQuantity').value = item.quantity;
+                document.getElementById('itemPrice').value = item.price;
+                document.getElementById('itemCategory').value = item.category;
+                showModal('itemModal');
+            }
+        }
+
+        async function saveItem() {
+            const id = document.getElementById('itemId').value;
+            const name = document.getElementById('itemName').value;
+            const sku = document.getElementById('itemSKU').value;
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const category = document.getElementById('itemCategory').value;
+
+            if (!name || !sku || isNaN(quantity) || isNaN(price) || !category) {
+                showMessage('Error', 'Please fill all fields with valid data');
+                return;
+            }
+
+            try {
+                await apiCall('/inventory', {
+                    method: 'POST',
+                    body: JSON.stringify({ id, name, sku, quantity, price, category })
+                });
+
+                hideModal('itemModal');
+                await loadInventory();
+                checkLowStock();
+            } catch (error) {
+            }
+        }
+
+        async function deleteItem(id) {
+            const item = inventory.find(item => item.id === id);
+            if (item && confirm(`Are you sure you want to delete "${item.name}"?`)) {
+                try {
+                    await apiCall(`/inventory/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    await loadInventory();
+                    checkLowStock();
+                } catch (error) {
+                }
+            }
+        }
+
+        async function loadInventory() {
+            try {
+                inventory = await apiCall('/inventory');
+                renderInventory();
+                updateStats();
+            } catch (error) {
+            }
+        }
+
+        async function loadTransactionLog() {
+            try {
+                const transactions = await apiCall('/transactions');
+                renderTransactionLog(transactions);
+            } catch (error) {
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalItems').textContent = inventory.length;
+
+            const totalValue = inventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
+
+            const lowStockCount = inventory.filter(item => item.quantity <= LOW_STOCK_THRESHOLD).length;
+            document.getElementById('lowStockCount').textContent = lowStockCount;
+
+            const categories = new Set(inventory.map(item => item.category));
+            document.getElementById('categoryCount').textContent = categories.size;
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventoryTableBody');
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+
+            const filteredInventory = inventory.filter(item =>
+                item.name.toLowerCase().includes(searchFilter) ||
+                item.sku.toLowerCase().includes(searchFilter)
+            );
+
+            tbody.innerHTML = '';
+
+            if (filteredInventory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-6 text-gray-500">
+                            <i class="fas fa-box-open text-3xl mb-2 block"></i>
+                            No items found. Add some items to your inventory.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredInventory.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+
+                const currentChecksum = generateChecksum(item);
+                const isDataValid = item.checksum === currentChecksum;
+
+                tr.innerHTML = `
+                    <td class="font-medium">${item.name} ${!isDataValid ? '<span class="badge badge-danger integrity-badge ml-2"><i class="fas fa-exclamation-triangle mr-1"></i> Integrity Error</span>' : ''}</td>
+                    <td>${item.sku}</td>
+                    <td>
+                        <span class="${item.quantity <= LOW_STOCK_THRESHOLD ? 'text-red-600 font-semibold' : ''}">
+                            ${item.quantity}
+                        </span>
+                        ${item.quantity <= LOW_STOCK_THRESHOLD ? '<span class="badge badge-danger ml-2">Low Stock</span>' : ''}
+                    </td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td><span class="badge badge-info">${item.category}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button onclick="showEditItemModal('${item.id}')" class="btn btn-secondary action-btn">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteItem('${item.id}')" class="btn btn-danger action-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderTransactionLog(transactions) {
+            const logContainer = document.getElementById('transactionLog');
+            logContainer.innerHTML = '';
+
+            if (!transactions || transactions.length === 0) {
+                logContainer.innerHTML = '<div class="log-entry text-center text-gray-500">No transactions yet</div>';
+                return;
+            }
+
+            transactions.forEach(entry => {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+
+                const date = new Date(entry.timestamp);
+                const formattedDate = date.toLocaleString();
+
+                logEntry.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <span class="font-medium text-gray-700">${entry.message}</span>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <i class="far fa-user mr-1"></i> ${entry.user} 
+                                <i class="far fa-clock ml-3 mr-1"></i> ${formattedDate}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                logContainer.appendChild(logEntry);
+            });
+        }
+
+        function checkLowStock() {
+            const lowStockItems = inventory.filter(item => item.quantity <= LOW_STOCK_THRESHOLD);
+            const alertElement = document.getElementById('lowStockAlerts');
+            const lowStockList = document.getElementById('lowStockList');
+
+            if (lowStockItems.length > 0) {
+                alertElement.classList.remove('hidden');
+                lowStockList.innerHTML = '';
+
+                lowStockItems.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} (SKU: ${item.sku}) - ${item.quantity} remaining`;
+                    lowStockList.appendChild(li);
+                });
+            } else {
+                alertElement.classList.add('hidden');
+            }
+        }
+
+        async function updateUI() {
+            if (currentUser) {
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('userProfile').classList.remove('hidden');
+                document.getElementById('currentUserDisplay').textContent = `Welcome, ${currentUser}`;
+                document.getElementById('appContent').classList.remove('hidden');
+
+                await loadInventory();
+                await loadTransactionLog();
+                checkLowStock();
+            } else {
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('userProfile').classList.add('hidden');
+                document.getElementById('appContent').classList.add('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+
+</html>
