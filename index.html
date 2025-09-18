@@ -820,7 +820,7 @@
         }
 
         function showEditItemModal(id) {
-            const item = inventory.find(item => item.id === id);
+            const item = inventory.find(item => String(item.id) === String(id));
             if (item) {
                 document.getElementById('itemModalTitle').textContent = 'Edit Item';
                 document.getElementById('itemId').value = item.id;
@@ -832,7 +832,7 @@
                 showModal('itemModal');
             }
         }
-
+        
         async function saveItem() {
             const id = document.getElementById('itemId').value;
             const name = document.getElementById('itemName').value;
@@ -846,10 +846,13 @@
                 return;
             }
 
+            const itemData = { id: id ? id : undefined, name, sku, quantity, price, category };
+            const checksum = generateChecksum(itemData);
+
             try {
                 await apiCall('/inventory', {
                     method: 'POST',
-                    body: JSON.stringify({ id, name, sku, quantity, price, category })
+                    body: JSON.stringify({ ...itemData, checksum })
                 });
 
                 hideModal('itemModal');
@@ -858,15 +861,15 @@
             } catch (error) {
             }
         }
-
+        
         async function deleteItem(id) {
-            const item = inventory.find(item => item.id === id);
+            const item = inventory.find(item => String(item.id) === String(id));
             if (item && confirm(`Are you sure you want to delete "${item.name}"?`)) {
                 try {
-                    await apiCall(`/inventory/${id}`, {
+                    await apiCall(`/inventory/${item.id}`, {
                         method: 'DELETE'
                     });
-
+        
                     await loadInventory();
                     checkLowStock();
                 } catch (error) {
